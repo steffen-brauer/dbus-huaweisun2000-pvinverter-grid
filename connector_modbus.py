@@ -44,6 +44,35 @@ class ModbusDataCollector2000Delux:
         self.invSun2000 = inverter.Sun2000(host=host, port=port, modbus_unit=modbus_unit)
         self.power_correction_factor = power_correction_factor
 
+    def getMeterData(self):
+        if not self.invSun2000.connect():
+            print("Connection error Modbus TCP")
+            return None
+        
+        data = {}
+
+        dbuspath = {
+            '/Ac/Power': {'initial': 0, "sun2000": registers.MeterEquipmentRegister.ActivePower, "f": -1},
+            '/Ac/L1/Current' : {'initial': 0, "sun2000": registers.MeterEquipmentRegister.APhaseCurrent, "f": -1 },
+            '/Ac/L1/Voltage' : {'initial': 0, "sun2000": registers.MeterEquipmentRegister.APhaseVoltage},
+            '/Ac/L1/Power' : {'initial': 0, "sun2000": registers.MeterEquipmentRegister.APhaseActivePower, "f": -1},
+            '/Ac/L2/Current' : {'initial': 0, "sun2000": registers.MeterEquipmentRegister.BPhaseCurrent, "f": -1},
+            '/Ac/L2/Voltage' : {'initial': 0, "sun2000": registers.MeterEquipmentRegister.BPhaseVoltage},
+            '/Ac/L2/Power' : {'initial': 0, "sun2000": registers.MeterEquipmentRegister.BPhaseActivePower, "f": -1},
+            '/Ac/L3/Current' : {'initial': 0, "sun2000": registers.MeterEquipmentRegister.CPhaseCurrent, "f": -1},
+            '/Ac/L3/Voltage' : {'initial': 0, "sun2000": registers.MeterEquipmentRegister.CPhaseVoltage},
+            '/Ac/L3/Power' : {'initial': 0, "sun2000": registers.MeterEquipmentRegister.CPhaseActivePower, "f": -1},
+
+        }
+
+        for k, v in dbuspath.items():
+            s = v.get("sun2000")
+            f = v.get("f",1)
+            data[k] = self.invSun2000.read(s) * f
+        
+        return data
+
+
     def getData(self):
         # the connect() method internally checks whether there's already a connection
         if not self.invSun2000.connect():
