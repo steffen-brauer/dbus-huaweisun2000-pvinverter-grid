@@ -16,7 +16,7 @@ class SystemBus(dbus.bus.BusConnection):
         return dbus.bus.BusConnection.__new__(cls, dbus.bus.BusConnection.TYPE_SYSTEM)
 
 
-class SystemBus(dbus.bus.BusConnection):
+class SessionBus(dbus.bus.BusConnection):
     def __new__(cls):
         return dbus.bus.BusConnection.__new__(cls, dbus.bus.BusConnection.TYPE_SESSION)
 
@@ -41,7 +41,7 @@ class HuaweiSUN2000Settings(object):
         self.settings = SettingsDevice(bus=self.dbus_conn, supportedSettings=supported_settings, eventCallback=self._handle_changed_setting)
 
     def _dbusconnection(self):
-        return SystemBus() if "DBUS_SESSION_BUS_ADDRESS" in os.environ else SystemBus()
+        return SessionBus() if "DBUS_SESSION_BUS_ADDRESS" in os.environ else SystemBus()
 
     def _handle_changed_setting(self, setting, oldvalue, newvalue):
         logging.info(f"setting changed, setting: {setting}, old: {oldvalue}, new: {newvalue}")

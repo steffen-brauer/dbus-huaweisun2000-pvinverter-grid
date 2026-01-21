@@ -29,7 +29,7 @@ from vedbus import VeDbusService
 class DbusSun2000Service:
     def __init__(self, servicename, settings, paths, data_connector, serialnumber='X',
                  productname='Huawei Sun2000 PV-Inverter'):
-        self._dbusservice = VeDbusService(servicename, SystemBus())
+        self._dbusservice = VeDbusService(servicename, SystemBus(), register=False)
         # self._paths = paths
         self._data_connector = data_connector
 
@@ -61,11 +61,13 @@ class DbusSun2000Service:
         self._dbusservice.add_path('/UpdateIndex', 0)
         self._dbusservice.add_path('/StatusCode', 7)
 
+        
         for _path, _settings in paths.items():
             self._dbusservice.add_path(
                 _path, _settings['initial'], gettextcallback=_settings.get('textformat', lambda p,v:v), writeable=True,
                 onchangecallback=self._handlechangedvalue)
 
+        self._dbusservice.register()
         GLib.timeout_add(settings.get('update_time_ms'), self._update)  # pause in ms before the next request
 
     def _update(self):
@@ -96,7 +98,7 @@ class DbusSun2000Service:
 class DbusSun2000MeterService:
     def __init__(self, servicename, settings, paths, data_connector, serialnumber='X',
                  productname='Huawei Sun2000 PV-Inverter'):
-        self._dbusservice = VeDbusService(servicename, SystemBus())
+        self._dbusservice = VeDbusService(servicename, SystemBus(),register = False)
         # self._paths = paths
         self._data_connector = data_connector
 
@@ -133,6 +135,7 @@ class DbusSun2000MeterService:
                 _path, _settings['initial'], gettextcallback=_settings.get('textformat', lambda p,v:v), writeable=True,
                 onchangecallback=self._handlechangedvalue)
 
+        self._dbusservice.register()
         GLib.timeout_add(settings.get('update_time_ms'), self._update)  # pause in ms before the next request
 
     def _update(self):
